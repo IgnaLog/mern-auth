@@ -1,19 +1,5 @@
-import fs from "fs";
-import path, { dirname } from "path";
-import { fileURLToPath } from "url";
 import bcrypt from "bcrypt";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-const loadJSON = (path) =>
-  JSON.parse(fs.readFileSync(new URL(path, import.meta.url)));
-
-const usersDB = {
-  users: loadJSON("../models/users.json"),
-  setUsers: function (data) {
-    this.users = data;
-  },
-};
+import User from "../models/User.js";
 
 const handleNewUser = async (req, res) => {
   const { user, pwd } = req.body;
@@ -22,23 +8,17 @@ const handleNewUser = async (req, res) => {
       .status(400)
       .json({ message: "Username and Password are required." });
   // Check for duplicate username in the db
-  const duplicate = usersDB.users.find((person) => person.username === user);
+  const duplicate = await User.findOne({ username: user }).exec();
   if (duplicate) return res.sendStatus(409); // Conflict
   try {
     // Encrypt the password
     const hashedPwd = await bcrypt.hash(pwd, 10); // 10 (salt) sets of random characters to form a hash with the password
-    // Store the new user
-    const newUser = {
+    // Create and store the new user
+    const newUser = await User.create({
       username: user,
-      roles: { User: 2001 },
       password: hashedPwd,
-    };
-    usersDB.setUsers([...usersDB.users, newUser]);
-    await fs.promises.writeFile(
-      path.join(__dirname, "..", "models", "users.json"),
-      JSON.stringify(usersDB.users)
-    );
-    console.log(usersDB.users);
+    });
+    console.log(newUser);
     res.status(201).json({ success: `New user ${user} created!` });
   } catch (err) {
     res.status(500).json({ message: err.message });

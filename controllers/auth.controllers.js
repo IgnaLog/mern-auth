@@ -1,21 +1,7 @@
-import fs from "fs";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import path, { dirname } from "path";
-import { fileURLToPath } from "url";
+import User from "../models/User.js";
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from "../config/dotenv.js";
-
-const __dirname = dirname(fileURLToPath(import.meta.url));
-
-const loadJSON = (path) =>
-  JSON.parse(fs.readFileSync(new URL(path, import.meta.url)));
-
-const usersDB = {
-  users: loadJSON("../models/users.json"),
-  setUsers: function (data) {
-    this.users = data;
-  },
-};
 
 const handleLogin = async (req, res) => {
   const { user, pwd } = req.body;
@@ -23,12 +9,14 @@ const handleLogin = async (req, res) => {
     return res
       .sendStatus(400)
       .json({ message: "Username and Password are required." });
-  const foundUser = usersDB.users.find((person) => person.username === user);
+  const foundUser = await User.findOne({ username: user }).exec();
   if (!foundUser) return res.sendStatus(401); // Unauthorized
+
   // Evaluate password
   const match = await bcrypt.compare(pwd, foundUser.password);
   if (match) {
     const roles = Object.values(foundUser.roles);
+
     // Create JWTs
     const accessToken = jwt.sign(
       {
@@ -45,24 +33,21 @@ const handleLogin = async (req, res) => {
       REFRESH_TOKEN_SECRET,
       { expiresIn: "1d" }
     );
-    const otherUsers = usersDB.users.filter(
-      (person) => person.username !== foundUser.username
-    );
+
     // Saving refreshToken with current user
-    const currentUser = { ...foundUser, refreshToken };
-    usersDB.setUsers([...otherUsers, currentUser]);
-    await fs.promises.writeFile(
-      path.join(__dirname, "..", "models", "users.json"),
-      JSON.stringify(usersDB.users)
-    );
-    // Send tokens to the frontEnd developer
+    foundUser.refreshToken = refreshToken;
+    const result = await foundUser.save();
+    console.log(result);
+
+    // Send tokens to the frontEnd developer.
     // Send the refreshToken and save as a cookie in the browser
     res.cookie("jwt", refreshToken, {
       httpOnly: true, // With 'httpOnly' it will only be accessible from an http request, not from a javascript, which makes it more secure
       sameSite: "None", // None: The cookie will be sent with requests made from any site, including requests from third parties.
-      secure: true, // The cookie will only be sent over a secure connection (https)
+      // secure: true, // The cookie will only be sent over a secure connection (https) (Only use in production)
       maxAge: 24 * 60 * 60 * 1000, // 1d in milliseconds
     });
+
     // Send the accessToken
     res.json({ accessToken });
   } else {

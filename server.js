@@ -11,13 +11,18 @@ import verifyJWT from "./middlewares/verifyJWT.js";
 import cookieParser from "cookie-parser";
 import rootRoutes from "./routes/root.routes.js";
 import employeesRoutes from "./routes/employees.routes.js";
+import usersRoutes from "./routes/users.routes.js";
 import registerRoutes from "./routes/register.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import refreshRoutes from "./routes/refresh.routes.js";
 import logoutRoutes from "./routes/logout.routes.js";
+import connectDB from "./config/dbConn.js";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
+
+/* Connection to MongoDB */
+connectDB();
 
 /* Middlewares */
 // Custom middleware logger
@@ -44,6 +49,7 @@ app.use("/refresh", refreshRoutes);
 app.use("/logout", logoutRoutes);
 app.use(verifyJWT);
 app.use("/employees", employeesRoutes);
+app.use("/users", usersRoutes);
 
 app.get("/", (req, res) => {
   res.send("Hello World");
