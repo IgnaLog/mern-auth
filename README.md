@@ -1,5 +1,7 @@
 # MERN Stack - Authentication and Authorization with JSON Web Tokens
 
+### Backend
+
 This backend application developed in [Node JS](https://nodejs.org/en/) and [Express](https://www.npmjs.com/package/express) performs authentication and authorization according to the [OAuth](https://es.wikipedia.org/wiki/OAuth) standard. For this, I use Access Tokens and Refresh Tokens through the [JSON Web Tokens (JWT)](https://jwt.io/) standard.
 
 I have created two data models in MongoDB with [mongoose](https://mongoosejs.com/). One for users and one for employees. Then, through the MVC development pattern in Express, I have created a series of routes and controllers to be able to register, log in and log out users, as well as refresh their access tokens with their respective refresh tokens that are safely stored in cookies using ' httpOnly' and other important security flags. For the latter I use the [cookie-parser](https://www.npmjs.com/package/cookie-parser) library.
@@ -8,7 +10,13 @@ For this, I have created a route where you can create, update, delete and consul
 
 In addition, this backend creates request and error logs. As well as some credentials to verify which domains are allowed for requests.
 
+### Frontend
+
+The client application made in [React](https://es.reactjs.org/) only handles users. You can register a user with user permissions. If you want to create users with other permissions, you must cold load it into the database. Then you can login and receive an Access Token to check the active users on the Administrator page (You will need a user with administrator permissions), as well as receive a Refresh Token that will be used in case the Access Token expires and be able to continue doing private queries using [Axios](https://axios-http.com/) and [Axios Interceptors](https://axios-http.com/docs/interceptors). I have also implemented that the login can be persistent in case you trust that device to use multiple times. In this way you can reload the page and continue making requests without having to log in again.
+
 ## 💻 Quick start
+
+### Backend
 
 To deploy this project, you must first install the node_modules packages. To do this, open a console with the main path of the project and run:
 
@@ -36,6 +44,10 @@ npm run dev
 ```
 
 I have left Thunder Client json file with some examples to make CRUD requests. You just have to have [Thunder Client](https://www.thunderclient.com/) installed and export it.
+
+### Frontend
+
+As in the backend you need to load the node_modules from the client folder through the `npm install` command, finally run also `npm run dev` to launch the client application.
 
 ## 📚 References
 

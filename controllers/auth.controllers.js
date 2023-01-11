@@ -15,7 +15,7 @@ const handleLogin = async (req, res) => {
   // Evaluate password
   const match = await bcrypt.compare(pwd, foundUser.password);
   if (match) {
-    const roles = Object.values(foundUser.roles);
+    const roles = Object.values(foundUser.roles).filter(Boolean);
 
     // Create JWTs
     const accessToken = jwt.sign(
@@ -44,12 +44,12 @@ const handleLogin = async (req, res) => {
     res.cookie("jwt", refreshToken, {
       httpOnly: true, // With 'httpOnly' it will only be accessible from an http request, not from a javascript, which makes it more secure
       sameSite: "None", // None: The cookie will be sent with requests made from any site, including requests from third parties.
-      // secure: true, // The cookie will only be sent over a secure connection (https) (Only use in production)
+      secure: true, // The cookie will only be sent over a secure connection (https) (Only use in production)
       maxAge: 24 * 60 * 60 * 1000, // 1d in milliseconds
     });
 
     // Send the accessToken
-    res.json({ accessToken });
+    res.json({ roles, accessToken });
   } else {
     res.sendStatus(401); // Unauthorized
   }

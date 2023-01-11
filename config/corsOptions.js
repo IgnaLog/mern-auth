@@ -1,15 +1,13 @@
 import allowedOrigins from "./allowedOrigins.js";
 
-const corsOptions = {
-  origin: (origin, callback) => {
-    if (allowedOrigins.indexOf(origin) !== -1 || !origin) {
-      // if the domain is in the whitelist
-      callback(null, true);
-    } else {
-      callback(new Error("Not allowed by CORS"));
-    }
-  },
-  optionsSuccessStatus: 200,
+var corsOptionsDelegate = (req, callback) => {
+  var corsOptions;
+  if (allowedOrigins.indexOf(req.header("Origin")) !== -1) {
+    corsOptions = { origin: true }; // reflect (enable) the requested origin in the CORS response
+  } else {
+    corsOptions = { origin: false }; // disable CORS for this request
+  }
+  callback(null, corsOptions); // callback expects two parameters: error and options
 };
 
-export default corsOptions;
+export default corsOptionsDelegate;

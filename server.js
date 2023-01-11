@@ -5,7 +5,7 @@ import cors from "cors";
 import logger from "./middlewares/logEvents.js";
 import errorHandle from "./middlewares/errorHandle.js";
 import credentials from "./middlewares/credentials.js";
-import corsOptions from "./config/corsOptions.js";
+import corsOptionsDelegate from "./config/corsOptions.js";
 import { PORT } from "./config/dotenv.js";
 import verifyJWT from "./middlewares/verifyJWT.js";
 import cookieParser from "cookie-parser";
@@ -31,7 +31,7 @@ app.use(logger);
 // and fetch cookies credentials requirement
 app.use(credentials);
 // Cross Origin Resources Sharing
-app.use(cors(corsOptions));
+app.use(cors(corsOptionsDelegate));
 // Built-in middleware to handle urlencoded form data
 app.use(express.urlencoded({ extended: false }));
 // Built-in middleware for json
@@ -50,21 +50,6 @@ app.use("/logout", logoutRoutes);
 app.use(verifyJWT);
 app.use("/employees", employeesRoutes);
 app.use("/users", usersRoutes);
-
-app.get("/", (req, res) => {
-  res.send("Hello World");
-});
-
-app.all("*", (req, res) => {
-  res.status(404);
-  if (req.accepts("html")) {
-    res.sendFile(path.join(__dirname, "views", "404.html"));
-  } else if (req.accepts("json")) {
-    res.json({ error: "404 Not Found" });
-  } else {
-    res.type("txt").send("404 Not Found");
-  }
-});
 
 /* Middlewares */
 // Middleware to handle errors

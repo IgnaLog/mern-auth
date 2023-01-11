@@ -5,6 +5,7 @@ import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from "../config/dotenv.js";
 const handleRefreshToken = async (req, res) => {
   const cookies = req.cookies;
   if (!cookies?.jwt) return res.sendStatus(401); // Unauthorized
+
   const refreshToken = cookies.jwt;
   const foundUser = await User.findOne({ refreshToken }).exec();
   if (!foundUser) return res.sendStatus(403); // Forbidden
@@ -24,7 +25,7 @@ const handleRefreshToken = async (req, res) => {
       ACCESS_TOKEN_SECRET,
       { expiresIn: "30s" } // Production expiresIn 5-15 min
     );
-    res.json({ accessToken });
+    res.json({ accessToken, roles });
   } catch (err) {
     return res.sendStatus(403);
   }
