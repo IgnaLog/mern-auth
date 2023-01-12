@@ -49,7 +49,7 @@ const handleLogin = async (req, res) => {
     });
 
     // Send the accessToken
-    res.json({ roles, accessToken });
+    res.json({ accessToken });
   } else {
     res.sendStatus(401); // Unauthorized
   }

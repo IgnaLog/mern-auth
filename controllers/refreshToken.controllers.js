@@ -25,7 +25,7 @@ const handleRefreshToken = async (req, res) => {
       ACCESS_TOKEN_SECRET,
       { expiresIn: "30s" } // Production expiresIn 5-15 min
     );
-    res.json({ accessToken, roles });
+    res.json({ accessToken });
   } catch (err) {
     return res.sendStatus(403);
   }
