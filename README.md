@@ -10,6 +10,8 @@ For this, I have created a route where you can create, update, delete and consul
 
 In addition, this backend creates request and error logs. As well as some credentials to verify which domains are allowed for requests.
 
+I have also developed a jwt rotation system to give it more security in the reuse of refresh tokens and so that a user can log in on multiple devices.
+
 ### Frontend
 
 The client application made in [React](https://es.reactjs.org/) only handles users. You can register a user with user permissions. If you want to create users with other permissions, you must cold load it into the database. Then you can login and receive an Access Token to check the active users on the Administrator page (You will need a user with administrator permissions), as well as receive a Refresh Token that will be used in case the Access Token expires and be able to continue doing private queries using [Axios](https://axios-http.com/) and [Axios Interceptors](https://axios-http.com/docs/interceptors). I have also implemented that the login can be persistent in case you trust that device to use multiple times. In this way you can reload the page and continue making requests without having to log in again.

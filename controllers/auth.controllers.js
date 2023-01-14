@@ -4,6 +4,8 @@ import User from "../models/User.js";
 import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from "../config/dotenv.js";
 
 const handleLogin = async (req, res) => {
+  const cookies = req.cookies;
+  console.log("cookie available: " + JSON.stringify(cookies));
   const { user, pwd } = req.body;
   if (!user || !pwd)
     return res
@@ -26,22 +28,52 @@ const handleLogin = async (req, res) => {
         },
       },
       ACCESS_TOKEN_SECRET,
-      { expiresIn: "30s" } // Production expiresIn 5-15 min
+      { expiresIn: "10s" } // Production expiresIn 5-15 min
     );
-    const refreshToken = jwt.sign(
+    const newRefreshToken = jwt.sign(
       { username: foundUser.username },
       REFRESH_TOKEN_SECRET,
       { expiresIn: "1d" }
     );
 
-    // Saving refreshToken with current user
-    foundUser.refreshToken = refreshToken;
+    // If there is no jwt cookie, we keep the refreshtoken array that the user already had, otherwise we filter it by removing the one that came in the cookies
+    let newRefreshTokenArray = !cookies?.jwt
+      ? foundUser.refreshToken
+      : foundUser.refreshToken.filter((rt) => rt !== cookies.jwt);
+
+    // If that cookie exists:
+    if (cookies?.jwt) {
+      /* 
+      Scenario added here: 
+          1) User logs in but never uses RT and does not logout 
+          2) RT is stolen
+          3) If 1 & 2, reuse detection is needed to clear all RTs when user logs in
+      */
+      const refreshToken = cookies.jwt;
+      const foundToken = await User.findOne({ refreshToken }).exec();
+
+      // Detected refresh token reuse!
+      if (!foundToken) {
+        console.log("attempted refresh token reuse at login!");
+        // clear out ALL previous refresh tokens
+        newRefreshTokenArray = [];
+      }
+      //  we send the order to delete it from the browser
+      res.clearCookie("jwt", {
+        httpOnly: true,
+        sameSite: "None",
+        secure: true,
+      });
+    }
+
+    // We update the user with the new refresh Tokens array created and the new refreshToken
+    foundUser.refreshToken = [...newRefreshTokenArray, newRefreshToken];
     const result = await foundUser.save();
     console.log(result);
 
     // Send tokens to the frontEnd developer.
     // Send the refreshToken and save as a cookie in the browser
-    res.cookie("jwt", refreshToken, {
+    res.cookie("jwt", newRefreshToken, {
       httpOnly: true, // With 'httpOnly' it will only be accessible from an http request, not from a javascript, which makes it more secure
       sameSite: "None", // None: The cookie will be sent with requests made from any site, including requests from third parties.
       secure: true, // The cookie will only be sent over a secure connection (https) (Only use in production)

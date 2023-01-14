@@ -13,8 +13,10 @@ const handleLogout = async (req, res) => {
     return res.sendStatus(204); // Successful, No content
   }
 
-  // Delete refreshToken in db
-  foundUser.refreshToken = "";
+  // Delete refreshToken in db. We keep the refresh tokens that were in the array minus the one used
+  foundUser.refreshToken = foundUser.refreshToken.filter(
+    (rt) => rt !== refreshToken
+  );
   const result = await foundUser.save();
   console.log(result);
 
