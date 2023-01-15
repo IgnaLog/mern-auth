@@ -5,7 +5,6 @@ import { ACCESS_TOKEN_SECRET, REFRESH_TOKEN_SECRET } from "../config/dotenv.js";
 
 const handleLogin = async (req, res) => {
   const cookies = req.cookies;
-  console.log("cookie available: " + JSON.stringify(cookies));
   const { user, pwd } = req.body;
   if (!user || !pwd)
     return res
