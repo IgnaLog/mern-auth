@@ -7,7 +7,7 @@ import { fileURLToPath } from "url";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 export const logEvents = async (message, logName) => {
-  const dateTime = `${format(new Date(), "yyyyMMdd\tHH:mm:ss")}`;
+  const dateTime = `${format(new Date(), "ddMMyyyy\tHH:mm:ss")}`;
   const logItem = `${dateTime}\t${uuidv4()}\t${message}\r\n`;
   try {
     if (!fs.existsSync(path.join(__dirname, "..", "logs"))) {

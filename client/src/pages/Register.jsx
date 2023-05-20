@@ -30,23 +30,6 @@ const Register = () => {
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
 
-  useEffect(() => {
-    userRef.current.focus();
-  }, []);
-
-  useEffect(() => {
-    setValidName(USER_REGEX.test(user));
-  }, [user]);
-
-  useEffect(() => {
-    setValidPwd(PWD_REGEX.test(pwd));
-    setValidMatch(pwd === matchPwd);
-  }, [pwd, matchPwd]);
-
-  useEffect(() => {
-    setErrMsg("");
-  }, [user, pwd, matchPwd]);
-
   const handleSubmit = async (e) => {
     e.preventDefault();
     // If button enabled with JS hack
@@ -66,10 +49,12 @@ const Register = () => {
         }
       );
       console.log(response.data);
-      console.log(response.accessToken);
       console.log(JSON.stringify(response));
       setSuccess(true);
       // Clear input fields
+      setUser("");
+      setPwd("");
+      setMatchPwd("");
     } catch (err) {
       if (!err?.response) {
         setErrMsg("No Server Response");
@@ -82,13 +67,30 @@ const Register = () => {
     }
   };
 
+  useEffect(() => {
+    userRef.current.focus();
+  }, []);
+
+  useEffect(() => {
+    setValidName(USER_REGEX.test(user));
+  }, [user]);
+
+  useEffect(() => {
+    setValidPwd(PWD_REGEX.test(pwd));
+    setValidMatch(pwd === matchPwd);
+  }, [pwd, matchPwd]);
+
+  useEffect(() => {
+    setErrMsg("");
+  }, [user, pwd, matchPwd]);
+
   return (
     <>
       {success ? (
         <section>
           <h1>Success!</h1>
           <p>
-            <a href="#">Sign In</a>
+            <a href="/login">Sign In</a>
           </p>
         </section>
       ) : (
@@ -168,7 +170,7 @@ const Register = () => {
               Must include uppercase and lowercase letters, a number and a
               special character.
               <br />
-              Allowed special characters:
+              Allowed special characters:&nbsp;
               <span aria-label="exclamation mark">!</span>
               <span aria-label="at symbol">@</span>
               <span aria-label="hashtag">#</span>
@@ -220,7 +222,7 @@ const Register = () => {
             <br />
             <span className="line">
               {/*put router link here*/}
-              <a href="#">Sign In</a>
+              <a href="/login">Sign In</a>
             </span>
           </p>
         </section>

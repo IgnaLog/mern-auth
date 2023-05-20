@@ -10,7 +10,7 @@ const Login = () => {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || "/";
+  const from = location.state?.from?.pathname || "/"; // It is used to get the previous location of the web page from which the login page is accessed. If either of the "state" or "from" properties does not exist, the default value "/" is returned.
 
   const userRef = useRef();
   const errRef = useRef();
@@ -18,14 +18,6 @@ const Login = () => {
   const [user, setUser] = useState("");
   const [pwd, setPwd] = useState("");
   const [errMsg, setErrMsg] = useState("");
-
-  useEffect(() => {
-    userRef.current.focus();
-  }, []);
-
-  useEffect(() => {
-    setErrMsg("");
-  }, [user, pwd]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,7 +35,7 @@ const Login = () => {
       setAuth({ user, accessToken });
       setUser("");
       setPwd("");
-      navigate(from, { replace: true });
+      navigate(from, { replace: true }); // The first argument of the navigate function is the location to which you want to redirect the user. "replace: true" is an options object used to replace the current entry in the browser history instead of adding a new entry. This means that if the user clicks the "Back" button in the browser, they will not return to the login page, but instead return to the page before the login page.
     } catch (err) {
       if (!err?.response) {
         setErrMsg("No Server Response");
@@ -61,6 +53,14 @@ const Login = () => {
   const togglePersist = () => {
     setPersist((prev) => !prev);
   };
+
+  useEffect(() => {
+    userRef.current.focus();
+  }, []);
+
+  useEffect(() => {
+    setErrMsg("");
+  }, [user, pwd]);
 
   useEffect(() => {
     localStorage.setItem("persist", persist);
@@ -112,7 +112,7 @@ const Login = () => {
         <br />
         <span className="line">
           {/*put router link here*/}
-          <a href="#">Sign Up</a>
+          <a href="/register">Sign Up</a>
         </span>
       </p>
     </section>

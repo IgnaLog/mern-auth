@@ -75,7 +75,7 @@ const handleRefreshToken = async (req, res) => {
     foundUser.refreshToken = [...newRefreshTokenArray];
     const result = await foundUser.save();
     console.log(result);
-    return res.sendStatus(403);
+    return res.sendStatus(403); // Forbidden
   }
 };
 

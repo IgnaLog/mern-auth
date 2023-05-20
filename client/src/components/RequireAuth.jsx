@@ -16,6 +16,7 @@ const RequireAuth = ({ allowedRoles }) => {
   ) : (
     <Navigate to="/login" state={{ from: location }} replace />
   );
+  // state={{ from: location }} helps us to know the previous route to /login so that after logging in it is redirected to that route. The replace property means that the "/login" URL will replace the current entry in the browsing history instead of adding a new entry.
 };
 
 export default RequireAuth;
